@@ -11,6 +11,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class PivotSubsystem extends SubsystemBase{
     public TalonFX pivotmotor = new TalonFX(17);
@@ -92,6 +93,4 @@ public class PivotSubsystem extends SubsystemBase{
             }
           };
     }
-
-
 }

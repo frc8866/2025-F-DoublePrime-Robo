@@ -21,17 +21,19 @@ public final class Constants {
   }
 
 
-
+  
   private static RobotState currentRobotState = RobotState.IDLE;
+  private static Elevatorposition curentElevatorposition = Elevatorposition.L0;
 
-  private static final double pivotl1 = -7.13134765625;
-  private static final double pivotl2= -26.300390625;
-  private static final double pivotl3 = -26.0193359375;
-  private static final double pivotl4 = -23.8123046875;
+  public static final double pivotl0 = 0;
+  public static final double pivotl1 = -7.13134765625;
+  public static final double pivotl2= -26.300390625;
+  public static final double pivotl3 = -26.0193359375;
+  public static final double pivotl4 = -23.8123046875;
 
   public enum SetpointGroup {
-    SETPOINTS1(List.of(0.0, 0.0, 0.0, 9.44423828125, 26.241796875, 5.0)),
-    SETPOINTS2(List.of(0.0, 7.75048828125, 7.75048828125, 35.0, 4.5, 5.5));
+    CoralSetpoints(List.of(0.0, 1.0, 2.0, 3.0,4.0, 5.0)),
+    AlgeaSetpoints(List.of(1.0,2.0, 3.0));  //fuck ass setpoints, arent right
 
     private final List<Double> setpoints;
 
@@ -44,13 +46,6 @@ public final class Constants {
     }
 }
 
-
-//function for updating/setting a robot state
-public static void setRobotState(RobotState newState) {
-  currentRobotState = newState;
-  System.out.println("Robot state updated to: " + newState);
-}
-
 public static enum RobotState {
   IDLE, // Robot is not doing anything
   MOVING, // Robot is driving
@@ -58,6 +53,35 @@ public static enum RobotState {
   SHOOTING, // Robot is shooting a game piece
   CLIMBING, // Robot is climbing
   ALGEA; // Robot has Algea intaked
+
+}
+
+public enum Elevatorposition {
+  L4,
+  L3,
+  L2,
+  L1, // using Motion Magic to drive to a setpoint
+  L0 // using a WPILib PID controller to hold the position
+}
+
+
+
+//function for updating/setting a robot state
+public static void setRobotState(RobotState newState) {
+  currentRobotState = newState;
+  System.out.println("Robot state updated to: " + newState);
+}
+public static RobotState getRobotState() {
+  return currentRobotState;
+}
+
+public static Elevatorposition getElevatorState() {
+  return curentElevatorposition;
+}
+
+public static void setElevatorState(Elevatorposition newState) {
+  curentElevatorposition = newState;
+  System.out.println("Robot state updated to: " + newState);
 }
 
 }

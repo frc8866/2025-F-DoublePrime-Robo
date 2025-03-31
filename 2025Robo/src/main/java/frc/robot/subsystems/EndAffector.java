@@ -79,7 +79,7 @@ public class EndAffector extends SubsystemBase{
 
     // Commands for algea
 
-    public Command algeaintake(double speed_positive_value) {
+    public Command algeaCommand(double speed) { // positive for intake, negative for outtake
         return new Command() {
             @Override
             public void initialize() {
@@ -89,7 +89,7 @@ public class EndAffector extends SubsystemBase{
             @Override
             public void execute() {
       
-              algaemotor.set(speed_positive_value);
+              algaemotor.set(speed);
             }
       
             @Override
@@ -100,31 +100,6 @@ public class EndAffector extends SubsystemBase{
             @Override
             public boolean isFinished() {
               return AlgeaVelocity() > 40; // Check if the setpoint is reached; // Check if the setpoint is reached
-            }
-          };
-    }
-    public Command algeaouttake(double speed_positive_value) {
-        return new Command() {
-            @Override
-            public void initialize() {
-              // Initialization code, such as resetting encoders or PID controllers
-              
-            }
-      
-            @Override
-            public void execute() {
-      
-              algaemotor.set(-speed_positive_value);
-            }
-      
-            @Override
-            public void end(boolean interrupted) {
-              algaemotor.set(0);
-            }
-      
-            @Override
-            public boolean isFinished() {
-              return algaemotor.getVelocity().getValueAsDouble() > 40; // Check if the setpoint is reached; // Check if the setpoint is reached
             }
           };
     }

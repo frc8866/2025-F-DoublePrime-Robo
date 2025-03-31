@@ -25,7 +25,6 @@ import frc.robot.*;
 import frc.robot.Constants;
 import frc.robot.Constants.SetpointGroup;
 
-import java.util.List;
 public class ElevatorSubsystem  extends SubsystemBase {
     public TalonFX r_elevatormotor = new TalonFX(13);
     public TalonFX l_elevatormotor = new TalonFX(14);
@@ -33,7 +32,9 @@ public class ElevatorSubsystem  extends SubsystemBase {
     private Slot0Configs slot0 = talonFXConfiguration.Slot0;
     MotionMagicConfigs motionMagicConfigs = talonFXConfiguration.MotionMagic;
     final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-    public SetpointGroup activeSetpointGroup = Constants.SetpointGroup.SETPOINTS1;
+    public SetpointGroup activeSetpointGroup = Constants.SetpointGroup.AlgeaSetpoints;
+    public PIDController elevatorPID = new PIDController(0.06, 0, 0);
+    private double pivotStateSetpoint;
 
     public ElevatorSubsystem () {
     // motion magic stuff, comments are there for understanding
@@ -92,11 +93,12 @@ public class ElevatorSubsystem  extends SubsystemBase {
         }
       }
 
-    public Command elevatorCommand(int value) {
+    public Command elevatorCommandMotionMagic(int value) {
         return new Command() {
           // Define a tolerance (adjust as needed based on your sensor units)
           private final double kTolerance = 0.2;
-    
+
+          
           @Override
           public void initialize() {
             // Optionally reset any state or encoders if needed
@@ -136,14 +138,117 @@ public class ElevatorSubsystem  extends SubsystemBase {
           }
         };
       }
+      public Command elevatorCommandPID(double position) {
+        return new Command() {
+            @Override
+            public void initialize() {
+              // Initialization code, such as resetting encoders or PID controllers
+              
+              
+              
+              //PID Way of doing it
+              elevatorPID.setSetpoint(position);
+            }
+      
+            @Override
+            public void execute() {
+            
+            
+            // PID way of doing it
+            double speed = elevatorPID.calculate(r_elevatormotor.getPosition().getValueAsDouble());
+            r_elevatormotor.set(speed);
+
+
+            // Motion Magic way of doing it
+            //r_elevatormotor.setControl(m_request.withPosition(position).withFeedForward(0.15));
+            //the feedforward is not required it just helps it being more personalized, like multiplying it by a constant
+
+            }
+      
+            @Override
+            public void end(boolean interrupted) {
+              r_elevatormotor.set(0);
+              r_elevatormotor.setControl(new VoltageOut(0));
+              l_elevatormotor.setControl(new VoltageOut(0));
+
+            }
+      
+            @Override
+            public boolean isFinished() {
+              return false;
+            }
+          };
+    }
+
+
 
       public void SettingRobotState() {
-        if (activeSetpointGroup == SetpointGroup.SETPOINTS1) {
-            activeSetpointGroup = SetpointGroup.SETPOINTS2;
+        if (activeSetpointGroup == SetpointGroup.CoralSetpoints) {
+            activeSetpointGroup = SetpointGroup.AlgeaSetpoints;
             Constants.setRobotState(Constants.RobotState.ALGEA);
         } else {
-            activeSetpointGroup = SetpointGroup.SETPOINTS1;
+            activeSetpointGroup = SetpointGroup.CoralSetpoints;
             Constants.setRobotState(Constants.RobotState.IDLE);
         }
       }
+
+      public Command elevatorStateCommand(int targetPosition, boolean is_pivot_up) {
+        return new Command() {
+          // Define a tolerance (adjust as needed based on your sensor units)
+
+          
+          @Override
+          public void initialize() {
+            // Optionally reset any state or encoders if needed
+            if (targetPosition == 1) {
+              Constants.setElevatorState(Constants.Elevatorposition.L1);
+            } else if (targetPosition == 2) {
+              Constants.setElevatorState(Constants.Elevatorposition.L2);
+            } else if (targetPosition == 3) {
+              Constants.setElevatorState(Constants.Elevatorposition.L3);
+            } else if (targetPosition == 4) {
+              Constants.setElevatorState(Constants.Elevatorposition.L4);
+            } else {
+              Constants.setElevatorState(Constants.Elevatorposition.L0);
+            }
+
+          }
+    
+          @Override
+          public void execute() {
+    
+            // Command the leader motor using Motion Magic with feedforward.
+            // (Since re is meant to follow le, remove direct control of re here.)
+            if (is_pivot_up) {
+              // Set flipsetpoint based on the desired elevator state.
+              if (Constants.getElevatorState() == Constants.Elevatorposition.L1) {
+                pivotStateSetpoint = Constants.pivotl1;
+        
+              } else if (Constants.getElevatorState() == Constants.Elevatorposition.L2) {
+                pivotStateSetpoint = Constants.pivotl2;
+              } else if (Constants.getElevatorState() == Constants.Elevatorposition.L3) {
+                pivotStateSetpoint = Constants.pivotl3;
+              } else if (Constants.getElevatorState() == Constants.Elevatorposition.L4) {
+                pivotStateSetpoint = Constants.pivotl4;
+        
+                // BargeShoot
+        
+              }
+              
+              elevatorPID.setSetpoint(pivotStateSetpoint);
+          }}
+
+          @Override
+          public void end(boolean interrupted) {
+
+          }
+
+          @Override
+          public boolean isFinished() {
+              return false;
+          }
+        };
+      }
+
+  
 }
