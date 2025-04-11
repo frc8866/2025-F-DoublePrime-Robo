@@ -14,7 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class EndAffector extends SubsystemBase{
+public class EndAffectorSubsystem extends SubsystemBase{
     public TalonFX algaemotor = new TalonFX(15);
     public TalonFX coralmotor = new TalonFX(16);
     TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
@@ -22,7 +22,7 @@ public class EndAffector extends SubsystemBase{
     MotionMagicConfigs motionMagicConfigs = talonFXConfiguration.MotionMagic;
     final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
 
-    public EndAffector () {
+    public EndAffectorSubsystem () {
     // motion magic stuff, comments are there for understanding
     slot0.kS = 0.25;
     slot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output

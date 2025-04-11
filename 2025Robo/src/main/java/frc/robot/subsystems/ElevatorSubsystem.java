@@ -116,9 +116,8 @@ public class ElevatorSubsystem  extends SubsystemBase {
 
           @Override
           public void end(boolean interrupted) {
-            // Once finished (or interrupted), stop the motors.
+            // Once finished, stop the motors.
             r_elevatormotor.setControl(new VoltageOut(0));
-            // If you’re using a follower, you can let it follow automatically.
             l_elevatormotor.setControl(new VoltageOut(0)); //this line is not useful
 
           }
@@ -138,47 +137,47 @@ public class ElevatorSubsystem  extends SubsystemBase {
           }
         };
       }
-      public Command elevatorCommandPID(double position) {
-        return new Command() {
-            @Override
-            public void initialize() {
-              // Initialization code, such as resetting encoders or PID controllers
+    //   public Command elevatorCommandPID(double position) {
+    //     return new Command() {
+    //         @Override
+    //         public void initialize() {
+    //           // Initialization code, such as resetting encoders or PID controllers
               
               
               
-              //PID Way of doing it
-              elevatorPID.setSetpoint(position);
-            }
+    //           //PID Way of doing it
+    //           elevatorPID.setSetpoint(position);
+    //         }
       
-            @Override
-            public void execute() {
+    //         @Override
+    //         public void execute() {
             
             
-            // PID way of doing it
-            double speed = elevatorPID.calculate(r_elevatormotor.getPosition().getValueAsDouble());
-            r_elevatormotor.set(speed);
+    //         // PID way of doing it
+    //         double speed = elevatorPID.calculate(r_elevatormotor.getPosition().getValueAsDouble());
+    //         r_elevatormotor.set(speed);
 
 
-            // Motion Magic way of doing it
-            //r_elevatormotor.setControl(m_request.withPosition(position).withFeedForward(0.15));
-            //the feedforward is not required it just helps it being more personalized, like multiplying it by a constant
+    //         // Motion Magic way of doing it
+    //         //r_elevatormotor.setControl(m_request.withPosition(position).withFeedForward(0.15));
+    //         //the feedforward is not required it just helps it being more personalized, like multiplying it by a constant
 
-            }
+    //         }
       
-            @Override
-            public void end(boolean interrupted) {
-              r_elevatormotor.set(0);
-              r_elevatormotor.setControl(new VoltageOut(0));
-              l_elevatormotor.setControl(new VoltageOut(0));
+    //         @Override
+    //         public void end(boolean interrupted) {
+    //           r_elevatormotor.set(0);
+    //           r_elevatormotor.setControl(new VoltageOut(0));
+    //           l_elevatormotor.setControl(new VoltageOut(0));
 
-            }
+    //         }
       
-            @Override
-            public boolean isFinished() {
-              return false;
-            }
-          };
-    }
+    //         @Override
+    //         public boolean isFinished() {
+    //           return false;
+    //         }
+    //       };
+    // }
 
 
 
@@ -191,64 +190,5 @@ public class ElevatorSubsystem  extends SubsystemBase {
             Constants.setRobotState(Constants.RobotState.IDLE);
         }
       }
-
-      public Command elevatorStateCommand(int targetPosition, boolean is_pivot_up) {
-        return new Command() {
-          // Define a tolerance (adjust as needed based on your sensor units)
-
-          
-          @Override
-          public void initialize() {
-            // Optionally reset any state or encoders if needed
-            if (targetPosition == 1) {
-              Constants.setElevatorState(Constants.Elevatorposition.L1);
-            } else if (targetPosition == 2) {
-              Constants.setElevatorState(Constants.Elevatorposition.L2);
-            } else if (targetPosition == 3) {
-              Constants.setElevatorState(Constants.Elevatorposition.L3);
-            } else if (targetPosition == 4) {
-              Constants.setElevatorState(Constants.Elevatorposition.L4);
-            } else {
-              Constants.setElevatorState(Constants.Elevatorposition.L0);
-            }
-
-          }
-    
-          @Override
-          public void execute() {
-    
-            // Command the leader motor using Motion Magic with feedforward.
-            // (Since re is meant to follow le, remove direct control of re here.)
-            if (is_pivot_up) {
-              // Set flipsetpoint based on the desired elevator state.
-              if (Constants.getElevatorState() == Constants.Elevatorposition.L1) {
-                pivotStateSetpoint = Constants.pivotl1;
-        
-              } else if (Constants.getElevatorState() == Constants.Elevatorposition.L2) {
-                pivotStateSetpoint = Constants.pivotl2;
-              } else if (Constants.getElevatorState() == Constants.Elevatorposition.L3) {
-                pivotStateSetpoint = Constants.pivotl3;
-              } else if (Constants.getElevatorState() == Constants.Elevatorposition.L4) {
-                pivotStateSetpoint = Constants.pivotl4;
-        
-                // BargeShoot
-        
-              }
-              
-              elevatorPID.setSetpoint(pivotStateSetpoint);
-          }}
-
-          @Override
-          public void end(boolean interrupted) {
-
-          }
-
-          @Override
-          public boolean isFinished() {
-              return false;
-          }
-        };
-      }
-
   
 }
