@@ -13,6 +13,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class EndAffectorSubsystem extends SubsystemBase{
     public TalonFX algaemotor = new TalonFX(15);
@@ -46,35 +47,13 @@ public class EndAffectorSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Algea Motor Velocity", AlgeaVelocity());
-        SmartDashboard.putNumber("Algea Motor Current Spike (StatorCurrent)", AlgeaCurrent()); // S
-        SmartDashboard.putNumber("Coral Motor Current Spike (StatorCurrent)", CoralCurrent());
-        SmartDashboard.putNumber("Coral Motor Velocity", CoralVelocity());
-        SmartDashboard.putNumber("Algeamotor Setpoint", algaemotor.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Coralmotor Setpoint", coralmotor.getPosition().getValueAsDouble());
-
+        SmartDashboard.putNumber("Algea Motor Velocity", algaemotor.getVelocity().getValueAsDouble());
+        SmartDashboard.putNumber("Coral Motor Velocity", coralmotor.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putNumber("Algea Motor Current Spike (StatorCurrent)", algaemotor.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Coral Motor Current Spike (StatorCurrent)", coralmotor.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("Algea Motor Voltage", algaemotor.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putNumber("Coral Motor Voltage", coralmotor.getMotorVoltage().getValueAsDouble());
     }
-
-
-    // Functions to help not repeating code
-
-    
-    public double AlgeaCurrent() { //Gets Motor's Current Output
-        return algaemotor.getStatorCurrent().getValueAsDouble();
-      }
-    
-    public double AlgeaVelocity() { //Gets Velocity of Motor
-        return algaemotor.getVelocity().getValueAsDouble();
-      }
-    
-    public double CoralCurrent() { //Gets Motor's Current Output
-        return coralmotor.getStatorCurrent().getValueAsDouble();
-      }
-    
-    public double CoralVelocity() { //Gets Velocity of Motor
-        return coralmotor.getMotorVoltage().getValueAsDouble();
-      }
-
 
 
     // Commands for algea
@@ -89,6 +68,12 @@ public class EndAffectorSubsystem extends SubsystemBase{
             @Override
             public void execute() {
       
+              if (speed == -0.2 && Math.abs(algaemotor.getVelocity().getValueAsDouble()) > 15) {
+                Constants.setRobotState(Constants.RobotState.ALGEA_NONE);
+              } else if (speed == Constants.backdrive_speed && Math.abs(algaemotor.getVelocity().getValueAsDouble()) < 4) {
+                Constants.setRobotState(Constants.RobotState.ALGEA_HOLDING);
+              } 
+
               algaemotor.set(speed);
             }
       
@@ -99,14 +84,12 @@ public class EndAffectorSubsystem extends SubsystemBase{
       
             @Override
             public boolean isFinished() {
-              return AlgeaVelocity() > 40; // Check if the setpoint is reached; // Check if the setpoint is reached
+              return algaemotor.getVelocity().getValueAsDouble() > 40; // Check if the setpoint is reached // Check if the setpoint is reached
             }
           };
     }
 
-    // Commands for coral
-
-  public Command backdrive(double backdrive_speed) {
+  public Command Algeabackdrive(double backdrive_speed) {
         return new Command() {
             @Override
             public void initialize() {
@@ -131,6 +114,10 @@ public class EndAffectorSubsystem extends SubsystemBase{
       
     }
 
+
+
+//Coral Commands
+
     public Command Coralcmd(double speed) {
       return new Command() {
         @Override
@@ -140,22 +127,54 @@ public class EndAffectorSubsystem extends SubsystemBase{
   
         @Override
         public void execute() {
-          algaemotor.set(speed);
+
+        if (speed == -0.2 && Math.abs(coralmotor.getVelocity().getValueAsDouble()) > 15) {
+          Constants.setRobotState(Constants.RobotState.CORAL_NONE);
+        } else if (speed == Constants.backdrive_speed && Math.abs(coralmotor.getVelocity().getValueAsDouble()) < 4) {
+          Constants.setRobotState(Constants.RobotState.CORAL_HOLDING);
+        } 
+
+
+
+        coralmotor.set(speed);
         }
   
         @Override
         public void end(boolean interrupted) {
-          algaemotor.set(0);
+          coralmotor.set(0);
         }
   
         @Override
         public boolean isFinished() {
-          return false;
+          return algaemotor.getVelocity().getValueAsDouble() > 50;
         }
       };
 
     }
 
-
+    public Command Coralbackdrive(double backdrive_speed) {
+      return new Command() {
+          @Override
+          public void initialize() {
+            // Initialization code, such as resetting encoders or PID controllers
+          }
+    
+          @Override
+          public void execute() {
+    
+            coralmotor.set(backdrive_speed);
+          }
+    
+          @Override
+          public void end(boolean interrupted) {
+          }
+    
+          @Override
+          public boolean isFinished() {
+            return false;
+          }
+        };
+    
+  }
 
 }

@@ -30,29 +30,26 @@ public final class Constants {
   public static final double pivotl2= -26.300390625;
   public static final double pivotl3 = -26.0193359375;
   public static final double pivotl4 = -23.8123046875;
+  public static final double elevatorl0 = 0;
+  public static final double elevatorl1 =;
+  public static final double elevatorl2= ;
+  public static final double elevatorl3 =;
+  public static final double elevatorl4 = ;
+  public static final double elevatoralgea =;
+  public static final double backdrive_speed = 0.07;
 
-  public enum SetpointGroup {
-    CoralSetpoints(List.of(0.0, 1.0, 2.0, 3.0,4.0, 5.0)),
-    AlgeaSetpoints(List.of(1.0,2.0, 3.0));  //fuck ass setpoints, arent right
 
-    private final List<Double> setpoints;
 
-    SetpointGroup(List<Double> setpoints) {
-        this.setpoints = setpoints;
-    }
-
-    public List<Double> getSetpoints() {
-        return setpoints;
-    }
-}
 
 public static enum RobotState {
   IDLE, // Robot is not doing anything
   MOVING, // Robot is driving
-  INTAKING, // Robot is picking up a game piece
+  CORAL_NONE, // Robot is picking up a game piece
+  CORAL_HOLDING,
   SHOOTING, // Robot is shooting a game piece
   CLIMBING, // Robot is climbing
-  ALGEA; // Robot has Algea intaked
+  ALGEA_NONE,
+  ALGEA_HOLDING; // Robot has Algea intaked
 
 }
 
@@ -60,8 +57,8 @@ public enum Elevatorposition {
   L4,
   L3,
   L2,
-  L1, // using Motion Magic to drive to a setpoint
-  L0 // using a WPILib PID controller to hold the position
+  L1,
+  L0
 }
 
 

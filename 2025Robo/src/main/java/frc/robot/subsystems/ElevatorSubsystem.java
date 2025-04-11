@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.*;
 import frc.robot.Constants;
-import frc.robot.Constants.SetpointGroup;
 
 public class ElevatorSubsystem  extends SubsystemBase {
     public TalonFX r_elevatormotor = new TalonFX(13);
@@ -32,7 +31,6 @@ public class ElevatorSubsystem  extends SubsystemBase {
     private Slot0Configs slot0 = talonFXConfiguration.Slot0;
     MotionMagicConfigs motionMagicConfigs = talonFXConfiguration.MotionMagic;
     final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
-    public SetpointGroup activeSetpointGroup = Constants.SetpointGroup.AlgeaSetpoints;
     public PIDController elevatorPID = new PIDController(0.06, 0, 0);
     private double pivotStateSetpoint;
 
@@ -93,25 +91,46 @@ public class ElevatorSubsystem  extends SubsystemBase {
         }
       }
 
-    public Command elevatorCommandMotionMagic(int value) {
+
+      public double position(int targetPosition) {
+        if (targetPosition == 1) {
+          Constants.setElevatorState(Constants.Elevatorposition.L1);
+          return Constants.elevatorl1;
+        } else if (targetPosition == 2) {
+          Constants.setElevatorState(Constants.Elevatorposition.L2);
+          return Constants.elevatorl2;
+        } else if (targetPosition == 3) {
+          Constants.setElevatorState(Constants.Elevatorposition.L3);
+          return Constants.elevatorl3;
+        } else if (targetPosition == 4) {
+          Constants.setElevatorState(Constants.Elevatorposition.L4);
+          return Constants.elevatorl4;
+        } else {
+          Constants.setElevatorState(Constants.Elevatorposition.L0);
+          return Constants.elevatorl0;
+        }
+      }
+
+    public Command elevatorCommandMotionMagic(int targetPosition) {
         return new Command() {
           // Define a tolerance (adjust as needed based on your sensor units)
           private final double kTolerance = 0.2;
 
-          
+
+
           @Override
           public void initialize() {
             // Optionally reset any state or encoders if needed
-    
-          }
-    
+            }
           @Override
           public void execute() {
+
+            
     
             // Command the leader motor using Motion Magic with feedforward.
             // (Since re is meant to follow le, remove direct control of re here.)
     
-            r_elevatormotor.setControl(m_request.withPosition(activeSetpointGroup.getSetpoints().get(value)).withFeedForward(0.4).withEnableFOC(true));
+            r_elevatormotor.setControl(m_request.withPosition(position(targetPosition)).withFeedForward(0.4).withEnableFOC(true));
           }
 
           @Override
@@ -137,7 +156,15 @@ public class ElevatorSubsystem  extends SubsystemBase {
           }
         };
       }
-    //   public Command elevatorCommandPID(double position) {
+
+
+
+// This is the PID way of doing it, but I am not using it because I am using motion magic
+
+
+
+
+//   public Command elevatorCommandPID(double position) {
     //     return new Command() {
     //         @Override
     //         public void initialize() {
@@ -179,16 +206,4 @@ public class ElevatorSubsystem  extends SubsystemBase {
     //       };
     // }
 
-
-
-      public void SettingRobotState() {
-        if (activeSetpointGroup == SetpointGroup.CoralSetpoints) {
-            activeSetpointGroup = SetpointGroup.AlgeaSetpoints;
-            Constants.setRobotState(Constants.RobotState.ALGEA);
-        } else {
-            activeSetpointGroup = SetpointGroup.CoralSetpoints;
-            Constants.setRobotState(Constants.RobotState.IDLE);
-        }
-      }
-  
 }

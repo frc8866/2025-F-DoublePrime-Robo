@@ -17,13 +17,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.*;
 import frc.robot.Constants;
 import java.util.List;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+
+
 
 public class ClimbSubsystem extends SubsystemBase{
-    public TalonFX climbmotor = new TalonFX(20);
+    public TalonFX climbmotor = new TalonFX(16);
     TalonFXConfiguration talonFXConfiguration = new TalonFXConfiguration();
     private Slot0Configs slot0 = talonFXConfiguration.Slot0;
     MotionMagicConfigs motionMagicConfigs = talonFXConfiguration.MotionMagic;
     final MotionMagicVoltage m_request = new MotionMagicVoltage(0);
+    private CANcoder climbencoder = new CANcoder(30);
 
 // PID Controller that can be used instead of Motion Magic
     //public PIDController ClimbUpPID = new PIDController(0.07, 0, 0);
@@ -31,6 +36,12 @@ public class ClimbSubsystem extends SubsystemBase{
 
 
     public ClimbSubsystem () {
+    // sets the encoder to be the one that is utlized for the climb motor so motion magic works
+    talonFXConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+    talonFXConfiguration.Feedback.FeedbackRemoteSensorID = climbencoder.getDeviceID();
+
+
+
     // motion magic stuff, comments are there for understanding
     slot0.kS = 0.25;
     slot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
@@ -59,14 +70,22 @@ public class ClimbSubsystem extends SubsystemBase{
 
     }
 
+    // can be used as a Tolerance function, where it can check if it is inside a tolerance and then return a true or false used for the 'isFinished' of a command rather than doing it inside the 'isfinished' function.
+    public Boolean error_check(double position, double tolerance_range) {
+      double currentposition = climbmotor.getPosition().getValueAsDouble();
+      if (currentposition - tolerance_range < position && currentposition + tolerance_range > position) {
+        return true;
+  
+      } else {
+        return false;
+      }
+    }
 
     public Command climbCommand(double position) {
         return new Command() {
             @Override
             public void initialize() {
               // Initialization code, such as resetting encoders or PID controllers
-              
-              
               
               //PID Way of doing it
               //ClimbDownPID.setSetpoint(position);
@@ -82,7 +101,11 @@ public class ClimbSubsystem extends SubsystemBase{
 
 
             // Motion Magic way of doing it
-            climbmotor.setControl(m_request.withPosition(position).withFeedForward(0.15)); 
+
+            // The EnableFOC is used for high torque applications, like climbing the entire robot
+            climbmotor.setControl(m_request.withPosition(position).withEnableFOC(true));
+
+            //.withFeedForward(0.15)
             //the feedforward is not required it just helps it being more personalized, like multiplying it by a constant
 
             }
@@ -91,14 +114,15 @@ public class ClimbSubsystem extends SubsystemBase{
             public void end(boolean interrupted) {
               // No point really of having this because once motion magic finishes its command, it should not keep running
               // but I have it here just in case
-              // Also for future reference, use VoltageOut to be 0, more accurate than speed = 0 because cutting the voltage out will be more accurate
+              // Also for future reference, use VoltageOut to be 0, more accurate than speed = 0 because cutting the voltage out will faster
               climbmotor.setControl(new VoltageOut(0));
 
             }
       
             @Override
             public boolean isFinished() {
-              return false;
+              double position = climbmotor.getPosition().getValueAsDouble();
+              return error_check(position, 0.2);
             }
           };
     }

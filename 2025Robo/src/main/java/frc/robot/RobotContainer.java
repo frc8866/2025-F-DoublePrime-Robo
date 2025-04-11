@@ -37,7 +37,8 @@ public class RobotContainer {
   private final ClimbSubsystem ClimbSubsystem = new ClimbSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController = new CommandXboxController(1);
+  private final CommandXboxController controller_uno = new CommandXboxController(0);
+  private final CommandXboxController controller_dos = new CommandXboxController(1);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -65,7 +66,10 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    //m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    controller_uno.b().whileTrue(ClimbSubsystem.climbCommand(10));
+    controller_uno.a().whileTrue(ClimbSubsystem.climbCommand(0));
+
   }
 
   /**
