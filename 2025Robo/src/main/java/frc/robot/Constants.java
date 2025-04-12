@@ -24,12 +24,16 @@ public final class Constants {
   
   private static RobotState currentRobotState = RobotState.IDLE;
   private static Elevatorposition curentElevatorposition = Elevatorposition.L0;
+  private static CoralState curentCoralposition = CoralState.CORAL_NONE;
+  private static AlgeaState curentAlgeaposition = AlgeaState.ALGEA_NONE;
 
   public static final double pivotl0 = 0;
   public static final double pivotl1 = -7.13134765625;
   public static final double pivotl2= -26.300390625;
   public static final double pivotl3 = -26.0193359375;
   public static final double pivotl4 = -23.8123046875;
+  public static final double pivotAlgeal2 = ;
+  public static final double pivotAlgeal3 = ;
   public static final double elevatorl0 = 0;
   public static final double elevatorl1 =;
   public static final double elevatorl2= ;
@@ -44,12 +48,10 @@ public final class Constants {
 public static enum RobotState {
   IDLE, // Robot is not doing anything
   MOVING, // Robot is driving
-  CORAL_NONE, // Robot is picking up a game piece
-  CORAL_HOLDING,
+  ALGEA, // Robot is picking up a game piece
+  CORAL,
   SHOOTING, // Robot is shooting a game piece
-  CLIMBING, // Robot is climbing
-  ALGEA_NONE,
-  ALGEA_HOLDING; // Robot has Algea intaked
+  CLIMBING, // Robot is climbing // Robot has Algea intaked
 
 }
 
@@ -61,6 +63,15 @@ public enum Elevatorposition {
   L0
 }
 
+public enum AlgeaState {
+  ALGEA_NONE,
+  ALGEA_HOLDING,
+}
+
+public enum CoralState {
+  CORAL_NONE,
+  CORAL_HOLDING,
+}
 
 
 //function for updating/setting a robot state
@@ -80,5 +91,21 @@ public static void setElevatorState(Elevatorposition newState) {
   curentElevatorposition = newState;
   System.out.println("Robot state updated to: " + newState);
 }
+public static void setCoralState(CoralState newState) {
+  curentCoralposition = newState;
+  System.out.println("Robot state updated to: " + newState);
+}
 
+public static void setAlgeaState(AlgeaState newState) {
+  curentAlgeaposition = newState;
+  System.out.println("Robot state updated to: " + newState);
+}
+
+public static CoralState getCoralState() {
+  return curentCoralposition;
+}
+
+public static AlgeaState getAlgeaState() {
+  return curentAlgeaposition;
+}
 }
