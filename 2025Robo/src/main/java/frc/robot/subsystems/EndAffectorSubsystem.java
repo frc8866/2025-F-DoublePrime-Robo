@@ -53,7 +53,9 @@ public class EndAffectorSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Coral Motor Current Spike (StatorCurrent)", coralmotor.getStatorCurrent().getValueAsDouble());
         SmartDashboard.putNumber("Algea Motor Voltage", algaemotor.getMotorVoltage().getValueAsDouble());
         SmartDashboard.putNumber("Coral Motor Voltage", coralmotor.getMotorVoltage().getValueAsDouble());
-    }
+    
+    
+      }
 
 
     // Commands for algea
@@ -69,9 +71,9 @@ public class EndAffectorSubsystem extends SubsystemBase{
             public void execute() {
       
               if (speed == -0.2 && Math.abs(algaemotor.getVelocity().getValueAsDouble()) > 15) {
-                Constants.setRobotState(Constants.RobotState.ALGEA_NONE);
+                Constants.setAlgeaState(Constants.AlgeaState.ALGEA_NONE);
               } else if (speed == Constants.backdrive_speed && Math.abs(algaemotor.getVelocity().getValueAsDouble()) < 4) {
-                Constants.setRobotState(Constants.RobotState.ALGEA_HOLDING);
+                Constants.setAlgeaState(Constants.AlgeaState.ALGEA_HOLDING);
               } 
 
               algaemotor.set(speed);
@@ -129,9 +131,9 @@ public class EndAffectorSubsystem extends SubsystemBase{
         public void execute() {
 
         if (speed == -0.2 && Math.abs(coralmotor.getVelocity().getValueAsDouble()) > 15) {
-          Constants.setRobotState(Constants.RobotState.CORAL_NONE);
+          Constants.setCoralState(Constants.CoralState.CORAL_NONE);
         } else if (speed == Constants.backdrive_speed && Math.abs(coralmotor.getVelocity().getValueAsDouble()) < 4) {
-          Constants.setRobotState(Constants.RobotState.CORAL_HOLDING);
+          Constants.setCoralState(Constants.CoralState.CORAL_HOLDING);
         } 
 
 
